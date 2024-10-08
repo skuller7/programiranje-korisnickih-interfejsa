@@ -7,6 +7,11 @@ import { RouterLink } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { FlightModel } from '../../models/flight.model';
 import { PageModel } from '../../models/page.model';
+import {MatInputModule} from '@angular/material/input';
+import {MatSelectModule} from '@angular/material/select';
+
+
+
 
 
 @Component({
@@ -19,7 +24,9 @@ import { PageModel } from '../../models/page.model';
     NgIf,
     NgFor,
     RouterLink,
-    MatListModule
+    MatListModule,
+    MatInputModule,
+    MatSelectModule
   ],
   //changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.component.html',
@@ -29,6 +36,18 @@ export class HomeComponent implements OnInit {
 
   public client: HttpClient
   public recommended: FlightModel[] = []
+  
+  public destinations: string[] = [
+    'Zagreb', 'Memmingen', 'Vienna'
+  ]
+  public airlines: string[] = [
+    'Air Serbia', 'Fly Emirates', 'Lufthansa'
+  ]
+  public flightClass: string[] = [
+    'First Class', 'Business', 'Economy'
+  ]
+
+
 
   constructor(private httpClient: HttpClient) {
     this.client = httpClient
