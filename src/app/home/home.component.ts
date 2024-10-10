@@ -1,17 +1,16 @@
 import { NgFor, NgIf } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { FlightModel } from '../../models/flight.model';
-import { PageModel } from '../../models/page.model';
-import {MatInputModule} from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
-
-
-
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { WebService } from '../../services/web.service';
+import { DataService } from '../../services/data.service';
+import { SearchContainerComponent } from "../search-container/search-container.component";
 
 
 @Component({
@@ -26,48 +25,32 @@ import {MatSelectModule} from '@angular/material/select';
     RouterLink,
     MatListModule,
     MatInputModule,
-    MatSelectModule
-  ],
-  //changeDetection: ChangeDetectionStrategy.OnPush,
+    MatSelectModule,
+    SearchContainerComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
 
-  public client: HttpClient
+  public webService: WebService
+  public dataService: DataService
   public recommended: FlightModel[] = []
-  
-  public destinations: string[] = [
-    'Zagreb', 'Memmingen', 'Vienna'
-  ]
-  public airlines: string[] = [
-    'Air Serbia', 'Fly Emirates', 'Lufthansa'
-  ]
-  public flightClass: string[] = [
-    'First Class', 'Business', 'Economy'
-  ]
+  public destinations: string[] = []
+  public airlines: string[] = []
+  public flightClass: string[] = []
 
-
-
-  constructor(private httpClient: HttpClient) {
-    this.client = httpClient
+  constructor() {
+    this.webService = new WebService()
+    this.dataService = new DataService()
   }
+
   ngOnInit(): void {
-    const url = 'https://flight.pequla.com/api/flight?page=0&size=3&type=departure&sort=scheduledAt,desc'
-    this.client.get<PageModel<FlightModel>>(url, {
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).subscribe(rsp => this.recommended = rsp.content)
-
+    this.webService.getRecommendedFlights().subscribe(rsp => this.recommended = rsp.content)
+    this.webService.getAvailableDestinations().subscribe(rsp => this.destinations = rsp)
+    this.airlines = this.dataService.getAirlines()
+    this.flightClass = this.dataService.getFlightClass()
   }
 
-  public generateImageUrl(dest: string) {
-    return `https://img.pequla.com/destination/${dest.split(' ')[0].toLowerCase()}.jpg`
-  }
-
-  public formatDate(iso: string) {
-    return new Date(iso).toLocaleString('sr-RS')
-  }
 
 }
